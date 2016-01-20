@@ -13,7 +13,7 @@ Résumons donc pour cette application, nous avons besoin :
 
 Nous resterons sciemment sur un fonctionnement simple afin de ne pas s'écarter de notre but initial.
 
-Voici ce que donne les sketch de notre application : 
+Voici ce que donne les sketch de notre application :
 
 <img src="./img/ecran1.png" width="200" style="float: left; margin:10px;"/>
 <img src="./img/ecran2.png" width="200" style="float: left; margin:10px;"/> <img src="./img/ecran3.png" style="margin:10px;" width="200"/>
@@ -48,15 +48,17 @@ www
 
 Comme vu plus haut nous aurons 3 pages principales, je propose donc dès à present d'ajouter un nouveau dossier *templates* qui contiendra nos templates de page qui seront remplis dynamiquement avec Angular.
 Créons donc tout de suite les fichiers :
-* accueil.html
-* listeArticles.html
-* detailArticles.html 
-Du coté JS, j'ai personnelement l'habitude de bien séparer mes controllers angular pour eviter les confusions de traitement Javascript et améliorer la maintenabilité de mes applications. Je vais donc appliquer cette doctrine ici.
-Créons maintenant nos controllers Angulars dans un dossier *js/controllers/. 
-* accueilController.js
-* listeArticlesController.js
-* detailArticlesController.js
-Nous n'aurons pas besoin d'enormement de styles CSS, une seule feuille de style conviendra donc parfaitement à nos besoins. Pas de modification de ce coté là.
+* `accueil.html`
+* `listeArticles.html`
+* `detailArticles.html`
+
+Du coté JS, j'ai personnellement l'habitude de bien séparer mes controllers Angular pour eviter les confusions de traitement Javascript et améliorer la maintenabilité de mes applications. Je vais donc appliquer cette doctrine ici.
+Créons maintenant nos controllers Angulars dans un dossier *js/controllers/*.
+* `accueilController.js`
+* `listeArticlesController.js`
+* `detailArticlesController.js`
+
+Nous n'aurons pas besoin d'énormement de styles CSS, une seule feuille de style conviendra donc parfaitement à nos besoins. Pas de modification de ce coté là.
 
 Voici notre arborescence de projet :
 ```bash
@@ -80,10 +82,10 @@ www
 ```
 C'est joli tout plein ! Oui enfin bon sans aucun contenu nous n'allons pas aller bien loin. Les sous-parties suivantes vont donc décrire étape par étape la complétion de ces fichiers.
 
-#### 1. [app.js & index.html] Mais où est-ce qu'on va ? (Routes et Redirections)
-Pour naviguer dans un site internet ou meme dans la vie de tout les jours il est important de savoir ou est-ce que l'on va, que ce soit en cliquant sur un lien ou à un embranchement de route. Dans une application ionic c'est un peu pareil sauf que pour concerver l'état de l'application d'une page à l'autre on utilise un router et, plus precisement *angular-ui-router*. Ce router va definir pour chaque embranchement ou url dans notre cas, le template ou le controller à utiliser. Ce qui vous me l'accorderez corresponds pas mal à ce que nous avons initialisé juste au-dessus... De la à dire que je l'ai fait exprès :p
+#### 1. [`app.js` & `index.html`] Mais où est-ce qu'on va ? (Routes et Redirections)
+Pour naviguer dans un site internet ou meme dans la vie de tout les jours il est important de savoir ou est-ce que l'on va, que ce soit en cliquant sur un lien ou à un embranchement de route. Dans une application ionic c'est un peu pareil sauf que pour concerver l'état de l'application d'une page à l'autre on utilise un router et, plus precisement `angular-ui-router`. Ce router va definir pour chaque embranchement ou url dans notre cas, le template ou le controller à utiliser. Ce qui vous me l'accorderez corresponds pas mal à ce que nous avons initialisé juste au-dessus... De la à dire que je l'ai fait exprès :p
 
-##### a. [index.html]
+##### a. [`index.html`]
 Occupons nous tout d'abord du fichier index.html. Ce dernier apportera le support à tous les templates. C'est le layout de base dans lequel sera inclus nos templates. Nous allons deja voir ce que celui-ci contient`suite à l'init de projet avec le starter blank.
 ```html
 <!DOCTYPE html>
@@ -122,10 +124,10 @@ Occupons nous tout d'abord du fichier index.html. Ce dernier apportera le suppor
 </html>
 ```
 
-Tout d'abord les inclusions CSS. l'on peut voir tout d'abord les fichier *ionic.css* et *style.css*. Le premier correspond à la feuille de style ionic comprenant tous les composants, tandis que le second correspond à la feuille de style de notre application. L'inclusion CSS commenté est présente dans le cas de l'utilisation de Sass pour modifier la feuille de style ionic. À titre d'information si vous ne connaissez pas [Sass](http://sass-lang.com/) je ne peux que vous conseiller de vous renseigner sur le sujet. 
+Tout d'abord les inclusions CSS. l'on peut voir tout d'abord les fichier `ionic.css` et `style.css`. Le premier correspond à la feuille de style ionic comprenant tous les composants, tandis que le second correspond à la feuille de style de notre application. L'inclusion CSS commenté est présente dans le cas de l'utilisation de Sass pour modifier la feuille de style ionic. À titre d'information si vous ne connaissez pas [Sass](http://sass-lang.com/) je ne peux que vous conseiller de vous renseigner sur le sujet.
 Cependant le cas present cela ne nous sera pas utile nous pouvons donc dès à présent supprimer cette partie de notre code.
 
-Du coté des inclusions javascript nous avons *ionic.bundle.js*, *cordova.js* et notre *app.js*. Le premier est le fichier js de ionic comprenant la charge utile de tous ces composants, le second, qui ne sera d'ailleur pas fonctionnel en developpement (en Desktop en tout cas), comprend tout le coeur de Cordova sur lequel comme vous devez maintenant surement le savoir, repose Ionic. Pourquoi n'est-il pas accessible en devellopement me direz-vous ? Eh bien il comprend tout le metier qui communiquera avec le téléphone et réalisera le lien entre les fonctionnalité natives du téléphone et notre code JS. Ce fichier ne peut donc fonctionner sur Desktop et est OS-dépendant. Ce fichier est uniquement ajouté au package lors de la compilation pour l'OS Cible.
+Du coté des inclusions javascript nous avons `ionic.bundle.js`, `cordova.js` et notre `app.js`. Le premier est le fichier js de ionic comprenant la charge utile de tous ces composants, le second, qui ne sera d'ailleur pas fonctionnel en developpement (en Desktop en tout cas), comprend tout le coeur de Cordova sur lequel comme vous devez maintenant surement le savoir, repose Ionic. Pourquoi n'est-il pas accessible en devellopement me direz-vous ? Eh bien il comprend tout le metier qui communiquera avec le téléphone et réalisera le lien entre les fonctionnalité natives du téléphone et notre code JS. Ce fichier ne peut donc fonctionner sur Desktop et est OS-dépendant. Ce fichier est uniquement ajouté au package lors de la compilation pour l'OS Cible.
 Le dernier fichier est app.js qui est le point d'entrée js de notre application.
 Nous pouvons également dès à present ajouter nos controllers aux inclusions cela nous evitera de revenir modifier le fichier plus tard.
 ```html
@@ -134,7 +136,7 @@ Nous pouvons également dès à present ajouter nos controllers aux inclusions c
 <script src="js/controllers/detailArticlesController.js"></script>
 ```
 
-Passons maintenant à la partie HTML et balises Ionic. Renommons notre app (nous le ferons également du coté de l'app.js) puis passont au balises ionic. Pour permettre la navigation par template et par routes il nous faut integrer un composant Ionic nommé ion-nav-view... et c'est tout :)
+Passons maintenant à la partie HTML et balises Ionic. Renommons notre app (nous le ferons également du coté de l'`app.js`) puis passont au balises ionic. Pour permettre la navigation par template et par routes il nous faut integrer un composant Ionic nommé ion-nav-view... et c'est tout :)
 
 Ce qui devrait vous donner quelque chose qui ressemble à ça :
 ```html
@@ -162,8 +164,8 @@ Ce qui devrait vous donner quelque chose qui ressemble à ça :
 </html>
 ```
 
-##### b. [app.js]
-Au tour de app.js de passer à la casserole c'est ici qu'on aura notre gestion de route pour l'application, il appelera également tous nos controllers.
+##### b. [`app.js`]
+Au tour de `app.js` de passer à la casserole c'est ici qu'on aura notre gestion de route pour l'application, il appelera également tous nos controllers.
 
 ```js
 // Ionic Starter App
@@ -195,15 +197,15 @@ Si vous n'êtes pas familiarisé à Angular et Javascript (callback nottament), 
 ```js
 angular.module('starter', ['ionic'])
 ```
-Le module starter (que l'on renommera) inclus une dependance à *ionic*. Ce dernier contenu dans le fichier js Ionic que nous avons inclus dans notre index.html. Il contient toutes les methodes et outils de ionic.
+Le module starter (que l'on renommera) inclus une dependance à `ionic`. Ce dernier contenu dans le fichier js Ionic que nous avons inclus dans notre index.html. Il contient toutes les methodes et outils de ionic.
 ```js
 .run(function($ionicPlatform) {
 ```
-Juste en dessous, la methode run est utilisée celle-ci permet d'executer du code une fois que le module a chargé toutes ces dépendances (ici Ionic donc). On passe à run une fonction de callback qui sera appelé une fois cette tache réalisée. Ici celle-ci prend en parametre *$ionicPlatform* qui est une abstraction Angular pour l'utilitaire ionic.Plateform.
+Juste en dessous, la methode run est utilisée celle-ci permet d'exécuter du code une fois que le module a chargé toutes ces dépendances (ici Ionic donc). On passe à `run` une fonction de callback qui sera appelé une fois cette tache réalisée. Ici celle-ci prend en parametre `$ionicPlatform` qui est une abstraction Angular pour l'utilitaire `ionic.Plateform`.
 ```js
 $ionicPlatform.ready(function() {
 ```
-La methode ready de *$ionicPlatform* est ensuite appelée, son fonctionnement est identique au run du module angular, on lui passe une fonction de callback qui sera appelée une fois le traitement fait. Il est a noter que d'une manière générale le functionnement par callback est très répendu en javascript.
+La methode `ready` de `$ionicPlatform` est ensuite appelée, son fonctionnement est identique au `run` du module angular, on lui passe une fonction de callback qui sera appelée une fois le traitement fait. Il est a noter que d'une manière générale le functionnement par callback est très répendu en javascript.
 ```js
 if(window.cordova && window.cordova.plugins.Keyboard) {
 	// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -219,10 +221,10 @@ if(window.StatusBar) {
 	StatusBar.styleDefault();
 }
 ```
-Vous vous souvenez que je vous ai parlé dans le point précédent du fichier *cordova.js* 
+Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`
 
 ##### c. En savoir plus
-Vous pouvez trouvez plus d'informations sur le routing avec angular-ui-router et ionic sur les liens suivants :
+Vous pouvez trouvez plus d'informations sur le routing avec `angular-ui-router` et ionic sur les liens suivants :
 * [Wiki Angular-ui-router](https://github.com/angular-ui/ui-router/wiki)
 * [Formula sur les Routes de Ionic - partie 1](http://learn.ionicframework.com/formulas/navigation-and-routing-part-1/)
 * [Formula sur les Routes de Ionic - partie 2](http://learn.ionicframework.com/formulas/navigation-and-routing-part-2/)
