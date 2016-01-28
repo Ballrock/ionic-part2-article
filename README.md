@@ -50,13 +50,13 @@ Comme vu plus haut nous aurons 3 pages principales, je propose donc dès à pres
 Créons donc tout de suite les fichiers :
 * `accueil.html`
 * `listeArticles.html`
-* `detailArticles.html`
+* `detailArticle.html`
 
 Du coté JS, j'ai personnellement l'habitude de bien séparer mes controllers Angular pour eviter les confusions de traitement Javascript et améliorer la maintenabilité de mes applications. Je vais donc appliquer cette doctrine ici.
 Créons maintenant nos controllers Angulars dans un dossier *js/controllers/*.
 * `accueilController.js`
 * `listeArticlesController.js`
-* `detailArticlesController.js`
+* `detailArticleController.js`
 
 Nous n'aurons pas besoin d'énormement de styles CSS, une seule feuille de style conviendra donc parfaitement à nos besoins. Pas de modification de ce coté là.
 
@@ -70,19 +70,36 @@ www
   │   ├───controllers
   │   │   ├───accueilController.js
   │   │   ├───listeArticlesController.js
-  │   │   └───detailArticlesController.js
+  │   │   └───detailArticleController.js
   │   └───app.js
   ├───lib
   │   └───ionic
   ├───templates
   │   ├───accueil.html
   │   ├───listeArticles.html
-  │   └───detailArticles.html
+  │   └───detailArticle.html
   └───index.html
 ```
 C'est joli tout plein ! Oui enfin bon sans aucun contenu nous n'allons pas aller bien loin. Les sous-parties suivantes vont donc décrire étape par étape la complétion de ces fichiers.
 
-#### 1. [`app.js` & `index.html`] Mais où est-ce qu'on va ? (Routes et Redirections)
+#### 1. [`controllers.js`] Il faut bien commencer quelque part (Initialisation des controllers AngularJS)
+
+Rien de bien compliqué ici, nous allons juste initialiser nos controllers AngularJS pour pouvoir les appeler depuis notre module principal `app.js`. Pour cela modifions les fichiers suivants pour qu'ils ressemblent au code ci-dessous :
+```js
+'use strict';
+
+angular.module('accueilController', [])
+.controller('AccueilCtrl', function(){
+});
+```
+* `accueilController.js`
+* `listeArticlesController.js`
+* `detailArticleController.js`
+
+On initialise juste des controllers vides. Nous les remplirons plus tard.
+
+#### 2. [`app.js` & `index.html`] Mais où est-ce qu'on va ? (Routes et Redirections)
+J'ai abordé très vite cette partie dans l'article 1 qui n'avait pour but que de présenter quelques base sans appronfidissement. Cette partie à donc pour but d'approfondir ce point.
 Pour naviguer dans un site internet ou meme dans la vie de tout les jours il est important de savoir ou est-ce que l'on va, que ce soit en cliquant sur un lien ou à un embranchement de route. Dans une application ionic c'est un peu pareil sauf que pour concerver l'état de l'application d'une page à l'autre on utilise un router et, plus precisement `angular-ui-router`. Ce router va definir pour chaque embranchement ou url dans notre cas, le template ou le controller à utiliser. Ce qui vous me l'accorderez corresponds pas mal à ce que nous avons initialisé juste au-dessus... De la à dire que je l'ai fait exprès :p
 
 ##### a. [`index.html`]
@@ -133,7 +150,7 @@ Nous pouvons également dès à present ajouter nos controllers aux inclusions c
 ```html
 <script src="js/controllers/accueilController.js"></script>
 <script src="js/controllers/listeArticlesController.js"></script>
-<script src="js/controllers/detailArticlesController.js"></script>
+<script src="js/controllers/detailArticleController.js"></script>
 ```
 
 Passons maintenant à la partie HTML et balises Ionic. Renommons notre app (nous le ferons également du coté de l'`app.js`) puis passont au balises ionic. Pour permettre la navigation par template et par routes il nous faut integrer un composant Ionic nommé ion-nav-view... et c'est tout :)
@@ -156,7 +173,7 @@ Ce qui devrait vous donner quelque chose qui ressemble à ça :
     <script src="js/app.js"></script>
     <script src="js/controllers/accueilController.js"></script>
     <script src="js/controllers/listeArticlesController.js"></script>
-    <script src="js/controllers/detailArticlesController.js"></script>
+    <script src="js/controllers/detailArticleController.js"></script>
   </head>
   <body ng-app="icysoft">
     <ion-nav-view></ion-nav-view>
@@ -221,13 +238,86 @@ if(window.StatusBar) {
 	StatusBar.styleDefault();
 }
 ```
-Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`
+Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`, celui-ci est injecté dans notre application est sert de pont de communication avec les fonctions natives du téléphone. 
+Ici on verifie que ce fichier est bien injecté (ainsi que son plugin Keyboard) avant d'executer les commmandes. Typiquement ce n'est pas le cas sur Desktop. Ensuite l'on applique quelque modification au clavier natif qui sont documenté dans le code ci-dessus.
+StatutBar est également un [plugin Cordova](https://github.com/apache/cordova-plugin-statusbar) ici il permet d'appliquer le style part defaut (texte sombre pour les fond lumineux).
+
+Et c'est tout.
+
+Maintenant que l'on a compris le fonctionnement de ce fichier nous allons demarrer les modifications.
+
+Nous allons d'abord renommer notre module angular puis integrer `angular-ui-router` 
+```js
+angular.module('icysoft', ['ionic'])
+```
+
+Pour `angular-ui-router` nous allons initialiser les différentes routes et etats de notre application. Chaque écran sera représentée par une url spécifique, c'est grâce à cet URL que notre router saura quel template afficher et avec quel controller AngularJS. Nous avons uniquement 3 écrans dans notre application, nous pouvons donc resumer toutes ces routes sous la forme du tableau suivant :
+
+| Ecran              | URL            | Variable | Template           | Controller         | 
+| :----------------- | :------------- | :------- | :----------------- | :----------------- |
+| Accueil            | /              |          | accueil.html       | AccueilCtrl        |
+| Liste des articles | /blog/         |          | listeArticles.html | ListeArticlesCtrl  |
+| Article            | /blog/:article | :article | detailArticle.html | DetailArticleCtrl |
+
+On peut voir que l'url d'accès aux articles sera différentes selon l'article, ce qui est somme toute relativement logique :D
+
+Implémentons à présent ce comportement dans notre `app.js` :
+
+```js
+.config(function($stateProvider, $urlRouterProvider) {
+  $stateProvider
+  .state('index', {
+    url: '/',
+    templateUrl: 'templates/accueil.html',
+    controller : 'AccueilCtrl'
+  })
+  .state('blog', {
+    abstact: true,
+    url: '/blog'
+  })
+  .state('blog.list', {
+    url: '',
+    templateUrl: 'templates/listeArticles.html',
+    controller : 'ListeArtCtrl'
+  })
+  .state('blog.article', {
+    url: '/:article',
+    templateUrl: 'templates/detailArticle.html',
+    controller : 'DetailArtCtrl'
+  });
+
+  $urlRouterProvider.otherwise('/');
+});
+```
+
+On peut voir tout les elements des tableaux dans ce code. Les seuls élements spéciaux sont l'abstract et le otherwise.
+
+```js
+.state('blog', {
+  abstact: true,
+  url: '/blog'
+})
+```
+L'abstract correspond à la création d'une route abstraite qui permet de creer aisement un systeme "d'heritage" sur les routes. Ici j'aurai pu par exemple y ajouter un temlate pour qu'il soit affiché chez tous ces fils. Il est possitionné sur l'url `/blog`. Ensuite je definis une route blog.list qui correspond à l'url vide (donc `/blog`) et un blog.articles qui correspond à l'url `/:article` donc (`/blog/:article`).
+
+```js
+$urlRouterProvider.otherwise('/');
+```
+Dans tous les autres cas on redirige vers / donc l'accueil.
+
+Voila avec cela on devrait pouvoir facilement trouver notre chemin ;)
 
 ##### c. En savoir plus
 Vous pouvez trouvez plus d'informations sur le routing avec `angular-ui-router` et ionic sur les liens suivants :
 * [Wiki Angular-ui-router](https://github.com/angular-ui/ui-router/wiki)
 * [Formula sur les Routes de Ionic - partie 1](http://learn.ionicframework.com/formulas/navigation-and-routing-part-1/)
 * [Formula sur les Routes de Ionic - partie 2](http://learn.ionicframework.com/formulas/navigation-and-routing-part-2/)
+
+#### 2. [`accueilController.js` & `accueil.html`] Bienvenue mesdames & messieurs ! (Gestion de l'accueil)
+
+##### a. [`accueil.html`]
+
+
 
 ### IV. L'interactivité
 
