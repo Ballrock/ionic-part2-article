@@ -82,6 +82,8 @@ www
 ```
 C'est joli tout plein ! Oui enfin bon sans aucun contenu nous n'allons pas aller bien loin. Les sous-parties suivantes vont donc décrire étape par étape la complétion de ces fichiers.
 
+### IV. Le contenu "statique"
+
 #### 1. [`controllers.js`] Il faut bien commencer quelque part (Initialisation des controllers AngularJS)
 
 Rien de bien compliqué ici, nous allons juste initialiser nos controllers AngularJS pour pouvoir les appeler depuis notre module principal `app.js`. Pour cela modifions les fichiers suivants pour qu'ils ressemblent au code ci-dessous :
@@ -317,10 +319,18 @@ Vous pouvez trouvez plus d'informations sur le routing avec `angular-ui-router` 
 
 ##### a. [`accueil.html`]
 
+Vous avez pu le voir dans la partie Définition du besoin, l'accueil de notre application est assez simple :
+* Un fond de couleur
+* Un logo
+* Deux boutons (dont un inactif)
 
+Petit rappel de notre écran :
+<img src="./img/ecran1.png" width="200" />
 
-### IV. L'interactivité
+Pour réaliser cela nous allons bien sur utiliser les composants ionic mais également le system de flexbox CSS3 (via ?) qui va grandement nous aider pour centrer joliment nos éléments et cela peu importe la résolution sur laquelle sera affichée notre application.
+
+### V. L'interactivité
 
 Note use service & factory
 
-### V. Aller plus loin
+### VI. Aller plus loin
