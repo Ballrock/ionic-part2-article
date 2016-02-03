@@ -1,17 +1,30 @@
 /* Empty. Add your own CSS if you like */
 .MainBox {
 	display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
+	background-color: #22AAFF;
 }
 
 .MainBox-item-center {
-  order: 0;
-    flex: 0 1 auto;
-    align-self: auto;
+	order: 0;
+  flex: 0 1 auto;
+  align-self: auto;
+}
+
+.SubBox {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-around;
+	align-content: center;
+	align-items: center;
+}
+
+.SubBox-item-center {
+	order: 0;
+	flex: 0 1 auto;
+	align-self: auto;
 }
 
 .logo {

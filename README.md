@@ -240,7 +240,7 @@ if(window.StatusBar) {
 	StatusBar.styleDefault();
 }
 ```
-Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`, celui-ci est injecté dans notre application est sert de pont de communication avec les fonctions natives du téléphone. 
+Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`, celui-ci est injecté dans notre application est sert de pont de communication avec les fonctions natives du téléphone.
 Ici on verifie que ce fichier est bien injecté (ainsi que son plugin Keyboard) avant d'executer les commmandes. Typiquement ce n'est pas le cas sur Desktop. Ensuite l'on applique quelque modification au clavier natif qui sont documenté dans le code ci-dessus.
 StatutBar est également un [plugin Cordova](https://github.com/apache/cordova-plugin-statusbar) ici il permet d'appliquer le style part defaut (texte sombre pour les fond lumineux).
 
@@ -248,14 +248,14 @@ Et c'est tout.
 
 Maintenant que l'on a compris le fonctionnement de ce fichier nous allons demarrer les modifications.
 
-Nous allons d'abord renommer notre module angular puis integrer `angular-ui-router` 
+Nous allons d'abord renommer notre module angular puis integrer `angular-ui-router`
 ```js
 angular.module('icysoft', ['ionic'])
 ```
 
 Pour `angular-ui-router` nous allons initialiser les différentes routes et etats de notre application. Chaque écran sera représentée par une url spécifique, c'est grâce à cet URL que notre router saura quel template afficher et avec quel controller AngularJS. Nous avons uniquement 3 écrans dans notre application, nous pouvons donc resumer toutes ces routes sous la forme du tableau suivant :
 
-| Ecran              | URL            | Variable | Template           | Controller         | 
+| Ecran              | URL            | Variable | Template           | Controller         |
 | :----------------- | :------------- | :------- | :----------------- | :----------------- |
 | Accueil            | /              |          | accueil.html       | AccueilCtrl        |
 | Liste des articles | /blog/         |          | listeArticles.html | ListeArticlesCtrl  |
@@ -328,6 +328,53 @@ Petit rappel de notre écran :
 <img src="./img/ecran1.png" width="200" />
 
 Pour réaliser cela nous allons bien sur utiliser les composants ionic mais également le system de flexbox CSS3 (via ?) qui va grandement nous aider pour centrer joliment nos éléments et cela peu importe la résolution sur laquelle sera affichée notre application.
+
+```html
+<ion-view view-title="accueil">
+	<ion-content class="MainBox Background">
+		<div class="MainBox-item-center">
+			<img src="img/logo.png" class="logo">
+		</div>
+		<div class="SubBox MainBox-item-center">
+			<button class="SubBox-item-center button button-positive">Apps</button>
+			<button class="SubBox-item-center button button-positive">Blog</button>
+		</div>
+	</ion-content>
+</ion-view>
+```
+
+```css
+.MainBox {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #22AAFF;
+}
+
+.MainBox-item-center {
+	order: 0;
+  flex: 0 1 auto;
+  align-self: auto;
+}
+
+.SubBox {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.SubBox-item-center {
+	order: 0;
+	flex: 0 1 auto;
+	align-self: auto;
+	border-color: black;
+}
+
+.logo {
+	max-width: 100%;
+}
+
+```
 
 ### V. L'interactivité
 
