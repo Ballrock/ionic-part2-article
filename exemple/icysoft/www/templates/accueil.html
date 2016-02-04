@@ -1,13 +1,11 @@
 <ion-view view-title="accueil">
-	<ion-content class="MainBox">
-		<div class="AccueilContent">
-			<span class="helper"></span><div class="MainBox-item-center">
-				<img src="img/logo.png" class="logo">
-			</div>
-			<div class="SubBox MainBox-item-center">
-				<button class="SubBox-item-center button button-positive">Apps</button>
-				<button class="SubBox-item-center button button-positive">Blog</button>
-			</div>
+	<ion-content class="Background">
+		<div>
+			<img src="img/logo.png" class="logo">
+		</div>
+		<div class="SubBox">
+			<button class="SubBox-item-center button button-large button-positive">Apps</button>
+			<button class="SubBox-item-center button button-large button-positive" ng-click="blog()">Blog</button>
 		</div>
 	</ion-content>
 </ion-view>

@@ -1,32 +1,25 @@
-/* Empty. Add your own CSS if you like */
-.MainBox {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: #22AAFF;
+/* Ionic Scroll */
+.scroll-content {
+	display: table !important;
+	width: 100% !important;
+	height: 100% !important;
+}
+.scroll {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
 }
 
-.MainBox-item-center {
-	order: 0;
-  flex: 0 1 auto;
-  align-self: auto;
+/* Content */
+.Background {
+	background-color: #22AAFF;
 }
 
 .SubBox {
 	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
 	justify-content: space-around;
-	align-content: center;
-	align-items: center;
-}
-
-.SubBox-item-center {
-	order: 0;
-	flex: 0 1 auto;
-	align-self: auto;
 }
 
 .logo {
-	max-width: 100%;
+	max-width: 90%;
 }

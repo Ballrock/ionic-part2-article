@@ -143,7 +143,8 @@ Occupons nous tout d'abord du fichier index.html. Ce dernier apportera le suppor
 </html>
 ```
 
-Tout d'abord les inclusions CSS. l'on peut voir tout d'abord les fichier `ionic.css` et `style.css`. Le premier correspond à la feuille de style ionic comprenant tous les composants, tandis que le second correspond à la feuille de style de notre application. L'inclusion CSS commenté est présente dans le cas de l'utilisation de Sass pour modifier la feuille de style ionic. À titre d'information si vous ne connaissez pas [Sass](http://sass-lang.com/) je ne peux que vous conseiller de vous renseigner sur le sujet.
+Tout d'abord les inclusions CSS. l'on peut voir tout d'abord les fichier `ionic.css` et `style.css`. Le premier correspond à la feuille de style ionic comprenant tous les composants, tandis que le second correspond à la feuille de style de notre application. L'inclusion CSS commenté est présente dans le cas de l'utilisation de Sass pour modifier la feuille de style ionic. 
+> Si vous ne connaissez pas [Sass](http://sass-lang.com/) je ne peux que vous conseiller de vous renseigner sur le sujet.
 Cependant le cas present cela ne nous sera pas utile nous pouvons donc dès à présent supprimer cette partie de notre code.
 
 Du coté des inclusions javascript nous avons `ionic.bundle.js`, `cordova.js` et notre `app.js`. Le premier est le fichier js de ionic comprenant la charge utile de tous ces composants, le second, qui ne sera d'ailleur pas fonctionnel en developpement (en Desktop en tout cas), comprend tout le coeur de Cordova sur lequel comme vous devez maintenant surement le savoir, repose Ionic. Pourquoi n'est-il pas accessible en devellopement me direz-vous ? Eh bien il comprend tout le metier qui communiquera avec le téléphone et réalisera le lien entre les fonctionnalité natives du téléphone et notre code JS. Ce fichier ne peut donc fonctionner sur Desktop et est OS-dépendant. Ce fichier est uniquement ajouté au package lors de la compilation pour l'OS Cible.
@@ -240,7 +241,7 @@ if(window.StatusBar) {
 	StatusBar.styleDefault();
 }
 ```
-Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`, celui-ci est injecté dans notre application est sert de pont de communication avec les fonctions natives du téléphone.
+Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`, celui-ci est injecté dans notre application est sert de pont de communication avec les fonctions natives du téléphone. 
 Ici on verifie que ce fichier est bien injecté (ainsi que son plugin Keyboard) avant d'executer les commmandes. Typiquement ce n'est pas le cas sur Desktop. Ensuite l'on applique quelque modification au clavier natif qui sont documenté dans le code ci-dessus.
 StatutBar est également un [plugin Cordova](https://github.com/apache/cordova-plugin-statusbar) ici il permet d'appliquer le style part defaut (texte sombre pour les fond lumineux).
 
@@ -248,14 +249,14 @@ Et c'est tout.
 
 Maintenant que l'on a compris le fonctionnement de ce fichier nous allons demarrer les modifications.
 
-Nous allons d'abord renommer notre module angular puis integrer `angular-ui-router`
+Nous allons d'abord renommer notre module angular puis integrer `angular-ui-router` 
 ```js
 angular.module('icysoft', ['ionic'])
 ```
 
 Pour `angular-ui-router` nous allons initialiser les différentes routes et etats de notre application. Chaque écran sera représentée par une url spécifique, c'est grâce à cet URL que notre router saura quel template afficher et avec quel controller AngularJS. Nous avons uniquement 3 écrans dans notre application, nous pouvons donc resumer toutes ces routes sous la forme du tableau suivant :
 
-| Ecran              | URL            | Variable | Template           | Controller         |
+| Ecran              | URL            | Variable | Template           | Controller         | 
 | :----------------- | :------------- | :------- | :----------------- | :----------------- |
 | Accueil            | /              |          | accueil.html       | AccueilCtrl        |
 | Liste des articles | /blog/         |          | listeArticles.html | ListeArticlesCtrl  |
@@ -327,57 +328,81 @@ Vous avez pu le voir dans la partie Définition du besoin, l'accueil de notre ap
 Petit rappel de notre écran :
 <img src="./img/ecran1.png" width="200" />
 
-Pour réaliser cela nous allons bien sur utiliser les composants ionic mais également le system de flexbox CSS3 (via ?) qui va grandement nous aider pour centrer joliment nos éléments et cela peu importe la résolution sur laquelle sera affichée notre application.
+Pour réaliser cela nous allons bien sur utiliser les composants ionic mais également le system de flexbox CSS3 qui va grandement nous aider pour disposer joliment nos éléments.
+> Flexbox étant un outil très pratique CSS3 je vous recommande chaudement de vous renseigner dessus :
+> * [Article AlsaCreation](http://www.alsacreations.com/tuto/lire/1493-css3-flexbox-layout-module.html)
+> * [Outils de génération Flexbox](http://the-echoplex.net/flexyboxes/)
 
+Voici l'état de mon template `accueil.html` après implémentation :
 ```html
 <ion-view view-title="accueil">
-	<ion-content class="MainBox Background">
-		<div class="MainBox-item-center">
-			<img src="img/logo.png" class="logo">
-		</div>
-		<div class="SubBox MainBox-item-center">
-			<button class="SubBox-item-center button button-positive">Apps</button>
-			<button class="SubBox-item-center button button-positive">Blog</button>
-		</div>
-	</ion-content>
+  <ion-content class="Background">
+    <div>
+      <img src="img/logo.png" class="logo">
+    </div>
+    <div class="SubBox">
+      <button class="SubBox-item-center button button-large button-positive">Apps</button>
+      <button class="SubBox-item-center button button-large button-positive" ng-click="blog()">Blog</button>
+    </div>
+  </ion-content>
 </ion-view>
 ```
+Ici on place uniquement notre `div` avec notre logo et notre `div` de boutons. Ces derniers utilise des composants Ionic et le bouton Blog est lié à la fonction `blog()` de notre controller via la directive `ng-click`.
 
 ```css
-.MainBox {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: #22AAFF;
+/* Ionic Scroll */
+.scroll-content {
+  display: table !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.scroll {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
 }
 
-.MainBox-item-center {
-	order: 0;
-  flex: 0 1 auto;
-  align-self: auto;
+/* Content */
+.Background {
+  background-color: #22AAFF;
 }
 
 .SubBox {
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-}
-
-.SubBox-item-center {
-	order: 0;
-	flex: 0 1 auto;
-	align-self: auto;
-	border-color: black;
+  display: flex;
+  justify-content: space-around;
 }
 
 .logo {
-	max-width: 100%;
+  max-width: 90%;
 }
-
 ```
+
+Quelques éléments intérressants ici :
+- Un petit trick css Ionic pour l'alignement vertical en effet, la compatibilité de celui-ci sur Android n'est pas faramineuse... :s
+- Le flebox pour l'alignement réparti des boutons (que je trouve, personnellement, très bien fait et facile a réaliser en flexbox)
+- La taille de notre logo qui s'ajustera à la taille de l'écran.
+
+##### b. [`accueilController.js`]
+
+Ce controller ne va pas être très rempli il nous permettra juste de réaliser les transitions avec les écrans suivants. Mais pourquoi utiliser un controller alors qu'on pourrait juste faire un lien vers l'écran suivant ? Justement pour permettre de gerer en Javascript tous les éléments complémentaires dont nous pourrions avoir besoin (exemple : Publicité, Analytics, Stockage de session, etc...)
+
+En l'occurence ici notre controller ressemblera à quelque chose comme cela :
+```js
+angular.module('accueilController', [])
+.controller('AccueilCtrl', function($scope,$state){
+  $scope.blog = function() {
+    $state.go('blog.list');
+  }
+});
+```
+On inclue les [scopes](https://docs.angularjs.org/guide/scope) `$scope` et `$state` qui vont respectivement nous permettre definir nos fonctions dans le scope du controller et d'acceder au scope de routes et etats pour pouvoir alterer celui-ci (changer de page).
+`$state.go` permet donc de changer l'etat de l'application. (avec en prime une jolie transition :D)
+
+#### 3. [`listeArticlesController.js` & `listeArticles.html`] Des articles par milliers (Gestion de la liste d'articles)
+
 
 ### V. L'interactivité
 
-Note use service & factory
+Note : use service & factory
 
 ### VI. Aller plus loin
