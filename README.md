@@ -326,6 +326,7 @@ Vous avez pu le voir dans la partie Définition du besoin, l'accueil de notre ap
 * Deux boutons (dont un inactif)
 
 Petit rappel de notre écran :
+
 <img src="./img/ecran1.png" width="200" />
 
 Pour réaliser cela nous allons bien sur utiliser les composants ionic mais également le system de flexbox CSS3 qui va grandement nous aider pour disposer joliment nos éléments.
@@ -335,7 +336,7 @@ Pour réaliser cela nous allons bien sur utiliser les composants ionic mais éga
 
 Voici l'état de mon template `accueil.html` après implémentation :
 ```html
-<ion-view view-title="accueil">
+<ion-view view-title="Icysoft">
   <ion-content class="Background">
     <div>
       <img src="img/logo.png" class="logo">
