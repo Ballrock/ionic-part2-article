@@ -16,22 +16,39 @@ angular.module('icysoft', ['ionic', 'accueilController', 'detailArticleControlle
   $stateProvider
   .state('index', {
     url: '/',
-    templateUrl: 'templates/accueil.html',
-    controller : 'AccueilCtrl'
+    views: {
+      'content': {
+        templateUrl: 'templates/accueil.html',
+        controller : 'AccueilCtrl'
+      }
+    }
   })
   .state('blog', {
     abstact: true,
-    url: '/blog'
+    url: '/blog',
+    views: {
+      'content': {
+        templateUrl: "templates/abstractArticle.html"
+      }
+    }
   })
   .state('blog.list', {
     url: '',
-    templateUrl: 'templates/listeArticles.html',
-    controller : 'ListeArtCtrl'
+    views: {
+      'blog': {
+        templateUrl: "templates/listeArticles.html",
+        controller: 'ListeArtCtrl'
+      }
+    }
   })
   .state('blog.article', {
     url: '/:article',
-    templateUrl: 'templates/detailArticle.html',
-    controller : 'DetailArtCtrl'
+    views: {
+      'blog': {
+        templateUrl: "templates/detailArticle.html",
+        controller: 'DetailArtCtrl'
+      }
+    }
   });
 
   $urlRouterProvider.otherwise('/');

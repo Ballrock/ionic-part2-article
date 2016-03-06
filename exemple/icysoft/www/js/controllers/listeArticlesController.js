@@ -1,5 +1,8 @@
 'use strict';
 
 angular.module('listeArticlesController', [])
-.controller('ListeArtCtrl', function(){
+.controller('ListeArtCtrl', function($scope,$state){
+  	$scope.article = function(id) {
+  		$state.go('blog.article');
+  	}
 });

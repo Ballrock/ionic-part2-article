@@ -8,7 +8,7 @@ Pour commencer nous allons faire quelques petits sketch de ce qu'on veut obtenir
 
 Résumons donc pour cette application, nous avons besoin :
 - Une page d'accueil permettant de se rediriger vers le blog
-- Une page listant les articles avec un aperçu, chaque article sera cliquable et permettra de se redireger vers la page de détail.
+- Une page listant les articles avec un aperçu, chaque article sera cliquable et permettra de se rediriger vers la page de détail.
 - Un page permettant de visualiser l'article dans sa globalité.
 
 Nous resterons sciemment sur un fonctionnement simple afin de ne pas s'écarter de notre but initial.
@@ -75,6 +75,7 @@ www
   ├───lib
   │   └───ionic
   ├───templates
+  │   ├───abstractArticle.html
   │   ├───accueil.html
   │   ├───listeArticles.html
   │   └───detailArticle.html
@@ -143,7 +144,7 @@ Occupons nous tout d'abord du fichier index.html. Ce dernier apportera le suppor
 </html>
 ```
 
-Tout d'abord les inclusions CSS. l'on peut voir tout d'abord les fichier `ionic.css` et `style.css`. Le premier correspond à la feuille de style ionic comprenant tous les composants, tandis que le second correspond à la feuille de style de notre application. L'inclusion CSS commenté est présente dans le cas de l'utilisation de Sass pour modifier la feuille de style ionic. 
+Tout d'abord les inclusions CSS. l'on peut voir tout d'abord les fichier `ionic.css` et `style.css`. Le premier correspond à la feuille de style ionic comprenant tous les composants, tandis que le second correspond à la feuille de style de notre application. L'inclusion CSS commenté est présente dans le cas de l'utilisation de Sass pour modifier la feuille de style ionic.
 > Si vous ne connaissez pas [Sass](http://sass-lang.com/) je ne peux que vous conseiller de vous renseigner sur le sujet.
 Cependant le cas present cela ne nous sera pas utile nous pouvons donc dès à présent supprimer cette partie de notre code.
 
@@ -241,7 +242,7 @@ if(window.StatusBar) {
 	StatusBar.styleDefault();
 }
 ```
-Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`, celui-ci est injecté dans notre application est sert de pont de communication avec les fonctions natives du téléphone. 
+Vous vous souvenez que je vous ai parlé dans le point précédent du fichier `cordova.js`, celui-ci est injecté dans notre application est sert de pont de communication avec les fonctions natives du téléphone.
 Ici on verifie que ce fichier est bien injecté (ainsi que son plugin Keyboard) avant d'executer les commmandes. Typiquement ce n'est pas le cas sur Desktop. Ensuite l'on applique quelque modification au clavier natif qui sont documenté dans le code ci-dessus.
 StatutBar est également un [plugin Cordova](https://github.com/apache/cordova-plugin-statusbar) ici il permet d'appliquer le style part defaut (texte sombre pour les fond lumineux).
 
@@ -249,14 +250,14 @@ Et c'est tout.
 
 Maintenant que l'on a compris le fonctionnement de ce fichier nous allons demarrer les modifications.
 
-Nous allons d'abord renommer notre module angular puis integrer `angular-ui-router` 
+Nous allons d'abord renommer notre module angular puis integrer `angular-ui-router`
 ```js
 angular.module('icysoft', ['ionic'])
 ```
 
 Pour `angular-ui-router` nous allons initialiser les différentes routes et etats de notre application. Chaque écran sera représentée par une url spécifique, c'est grâce à cet URL que notre router saura quel template afficher et avec quel controller AngularJS. Nous avons uniquement 3 écrans dans notre application, nous pouvons donc resumer toutes ces routes sous la forme du tableau suivant :
 
-| Ecran              | URL            | Variable | Template           | Controller         | 
+| Ecran              | URL            | Variable | Template           | Controller         |
 | :----------------- | :------------- | :------- | :----------------- | :----------------- |
 | Accueil            | /              |          | accueil.html       | AccueilCtrl        |
 | Liste des articles | /blog/         |          | listeArticles.html | ListeArticlesCtrl  |
@@ -271,22 +272,39 @@ Implémentons à présent ce comportement dans notre `app.js` :
   $stateProvider
   .state('index', {
     url: '/',
-    templateUrl: 'templates/accueil.html',
-    controller : 'AccueilCtrl'
+    views: {
+      'content': {
+        templateUrl: 'templates/accueil.html',
+        controller : 'AccueilCtrl'
+      }
+    }
   })
   .state('blog', {
     abstact: true,
-    url: '/blog'
+    url: '/blog',
+    views: {
+      'content': {
+        templateUrl: "templates/abstractArticle.html"
+      }
+    }
   })
   .state('blog.list', {
     url: '',
-    templateUrl: 'templates/listeArticles.html',
-    controller : 'ListeArtCtrl'
+    views: {
+      'blog': {
+        templateUrl: "templates/listeArticles.html",
+        controller: 'ListeArtCtrl'
+      }
+    }
   })
   .state('blog.article', {
     url: '/:article',
-    templateUrl: 'templates/detailArticle.html',
-    controller : 'DetailArtCtrl'
+    views: {
+      'blog': {
+        templateUrl: "templates/detailArticle.html",
+        controller: 'DetailArtCtrl'
+      }
+    }
   });
 
   $urlRouterProvider.otherwise('/');
@@ -298,10 +316,15 @@ On peut voir tout les elements des tableaux dans ce code. Les seuls élements sp
 ```js
 .state('blog', {
   abstact: true,
-  url: '/blog'
+  url: '/blog',
+  views: {
+    'content': {
+      templateUrl: "templates/abstractArticle.html"
+    }
+  }
 })
 ```
-L'abstract correspond à la création d'une route abstraite qui permet de creer aisement un systeme "d'heritage" sur les routes. Ici j'aurai pu par exemple y ajouter un temlate pour qu'il soit affiché chez tous ces fils. Il est possitionné sur l'url `/blog`. Ensuite je definis une route blog.list qui correspond à l'url vide (donc `/blog`) et un blog.articles qui correspond à l'url `/:article` donc (`/blog/:article`).
+L'abstract correspond à la création d'une route abstraite qui permet de creer aisement un systeme "d'heritage" sur les routes. Ici par exemple j'ai ajouté un temlate pour qu'il soit affiché chez tous ces fils et qui correspondra au header. Il est possitionné sur l'url `/blog`. Ensuite je definis une route blog.list qui correspond à l'url vide (donc `/blog`) et un blog.articles qui correspond à l'url `/:article` donc (`/blog/:article`).
 
 ```js
 $urlRouterProvider.otherwise('/');
@@ -337,50 +360,53 @@ Pour réaliser cela nous allons bien sur utiliser les composants ionic mais éga
 Voici l'état de mon template `accueil.html` après implémentation :
 ```html
 <ion-view view-title="Icysoft">
-  <ion-content class="Background">
-    <div>
-      <img src="img/logo.png" class="logo">
-    </div>
-    <div class="SubBox">
-      <button class="SubBox-item-center button button-large button-positive">Apps</button>
-      <button class="SubBox-item-center button button-large button-positive" ng-click="blog()">Blog</button>
-    </div>
-  </ion-content>
+	<style>
+	</style>
+	<ion-content class="Background" overflow-scroll="true">
+		<div class="Logo">
+		</div>
+		<div class="SubBox">
+			<button class="SubBox-item-center button button-large button-positive">Apps</button>
+			<button class="SubBox-item-center button button-large button-positive" ng-click="blog()">Blog</button>
+		</div>
+	</ion-content>
 </ion-view>
 ```
 Ici on place uniquement notre `div` avec notre logo et notre `div` de boutons. Ces derniers utilise des composants Ionic et le bouton Blog est lié à la fonction `blog()` de notre controller via la directive `ng-click`.
 
 ```css
-/* Ionic Scroll */
-.scroll-content {
-  display: table !important;
-  width: 100% !important;
-  height: 100% !important;
-}
-.scroll {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-}
-
 /* Content */
 .Background {
-  background-color: #22AAFF;
+	background-color: #22AAFF;
+	display: flex;
+	webkit-display:flex;
+	moz-display:flex;
+	width:100%;
+}
+
+.Logo {
+  width: 100%;
+	height: 80%;
+  background-image: url(../img/logo.png);
+  background-size: 75%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .SubBox {
-  display: flex;
-  justify-content: space-around;
+	display: flex;
+	justify-content: space-around;
 }
 
-.logo {
-  max-width: 90%;
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+	display: none;
 }
 ```
 
 Quelques éléments intérressants ici :
-- Un petit trick css Ionic pour l'alignement vertical en effet, la compatibilité de celui-ci sur Android n'est pas faramineuse... :s
-- Le flebox pour l'alignement réparti des boutons (que je trouve, personnellement, très bien fait et facile a réaliser en flexbox)
+- Un petit trick CSS Ionic pour supprimer la scrollbar avec overflow-scroll=true.
+- Le flebox pour l'alignement réparti des boutons (que je trouve, personnellement, très bien fait et facile à réaliser en flexbox)
 - La taille de notre logo qui s'ajustera à la taille de l'écran.
 
 ##### b. [`accueilController.js`]
@@ -396,14 +422,108 @@ angular.module('accueilController', [])
   }
 });
 ```
-On inclue les [scopes](https://docs.angularjs.org/guide/scope) `$scope` et `$state` qui vont respectivement nous permettre definir nos fonctions dans le scope du controller et d'acceder au scope de routes et etats pour pouvoir alterer celui-ci (changer de page).
-`$state.go` permet donc de changer l'etat de l'application. (avec en prime une jolie transition :D)
+On inclue les [scopes](https://docs.angularjs.org/guide/scope) `$scope` et `$state` qui vont respectivement nous permettre definir nos fonctions dans le scope du controller et d'acceder au scope de routes et états pour pouvoir alterer celui-ci (changer de page).
+`$state.go` permet donc de changer l'état de l'application. (avec en prime une jolie transition :D)
 
-#### 3. [`listeArticlesController.js` & `listeArticles.html`] Des articles par milliers (Gestion de la liste d'articles)
+#### 3. [`abstractArticle.html`] Abstrait toi même ! (Gestion du template abstrait de notre application)
 
+Ce template va uniquement nous servire ici de header pour nos pages `listeArticles` et `detailArticle`. Nous allons uniquement definir le theme de la bar de navigation ainsi qu'un petit bouton magique de "back" qui s'accorde automatiquement avec angular-ui-router pour réaliser un retour arriere cohérent dans notre application.
+
+```html
+<ion-nav-bar class="bar-positive">
+     <ion-nav-back-button>
+     </ion-nav-back-button>
+</ion-nav-bar>
+<ion-nav-view name="blog"></ion-nav-view>
+```
+Comme on peut le voir, ce n'est pas grand chose. On definit la bar de navigation via la directive `ion-nav-bar` de Ionic, la class `bar-positive` definit uniquement le jeu de couleur utilisé. La directive `ion-nav-back-button` definit quand à elle le bouton de retour, ni plus ni moins. Une fois la barre de navigation créée, on ajoute juste la ion-nav-view pour que les autres templates soient injectés dedans.
+
+#### 4. [`listeArticlesController.js` & `listeArticles.html`] Des articles par milliers (Gestion de la liste d'articles)
+
+##### a. [`listeArticles.html`]
+
+Ici nous allons implementer un composant Ionic de type liste pour afficher nos articles, dans un premier temps, cette page, cette page ne sera pas interactive, et presentera seulement un liste d'article en dur.
+
+```html
+<ion-view view-title="Blog">
+	<ion-content class="padding">
+		<div class="list">
+			<a class="item item-thumbnail-left" href="#" ng-click="article('test')">
+				 <img ng-src="./img/ionic.png" />
+				<h2>Article 1</h2>
+				<h4>Ceci est le resumé d'un article très intéressant et fort instructif, j'ai nommé Article 1</h4>
+			</a>
+			[...]
+			<a class="item item-thumbnail-left" href="#" ng-click="article('test')">
+				 <img ng-src="./img/ionic.png" />
+				<h2>Article X</h2>
+				<h4>Ceci est le resumé d'un article très intéressant et fort instructif, j'ai nommé Article X</h4>
+			</a>
+		</div>
+	</ion-content>
+</ion-view>
+```
+
+Le seul point à retenir ici est le ng-click qui va rediriger vers une méthode similaire à ce que l'on a pu voir précedement.
+
+##### b. [`listeArticlesController.js`]
+
+Il reste une méthode à implementer, pour l'instant, de la a même maniere qu'elle a pu l'être dans le précédent controller. À savoir :
+```js
+'use strict';
+
+angular.module('listeArticlesController', [])
+.controller('ListeArtCtrl', function($scope,$state){
+  	$scope.article = function(id) {
+  		$state.go('blog.article');
+  	}
+});
+```
+
+#### 5. [`detailArticle.html`] Il est frais, il est beau, mon article ! (Affichage d'un article)
+
+##### a. [`detailArticle.html`]
+
+J'ai utilisé ici, pour changer, le system de Flexbox integré directement dans Ionic via les classes CSS `row` et `col`, je vous invite à aller voir la description du système de grille [TODO].
+
+On obtient quelque chose resemblant à cela :
+
+```html
+<ion-view view-title="Article Test">
+  <ion-content class="padding">
+    <div class="row">
+      <div>
+        <img ng-src="./img/ionic.png" style="width:90px;"/>
+      </div>
+      <div style="margin:10px;">
+        <h2>Article Test</h2>
+        <h5>Antoine Précigout - 01/01/1970</h5>
+      </div>
+    </div>
+    <div class="col">
+      <p>
+        Lorem ipsum dolor sit amet, [...] laborum.
+      </p>
+      <p>
+        Lorem ipsum dolor sit amet, [...] laborum.
+      </p>
+    </div>
+  </ion-content>
+</ion-view>
+```   
+
+Toujours dans une optique statique. Nous dynamiserons tout ca dans le chapitre suivant.
+
+#### 6. Conclusion
+
+Nous avons pu aborder dans ce chapitre tous les éléments structurels nous permettant de creer une application basique et statique. Plus important encore nous pouvons naviguer facilement entre les pages et garder un worflow cohérent avec `angular-ui-router`, ce qui nous permet de faire de `back` entre les pages automatiquement.
 
 ### V. L'interactivité
 
+
 Note : use service & factory
+Note : Markdown ? vérifier les services
 
 ### VI. Aller plus loin
+
+Note : test de connexion, stockage local ect....
