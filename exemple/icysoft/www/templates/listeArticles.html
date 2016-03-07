@@ -1,10 +1,12 @@
 <ion-view view-title="Blog">
 	<ion-content class="padding">
 		<div class="list">
-			<a ng-repeat="article in articles" class="item item-thumbnail-left" href="#" ng-click="article('test')">
+			<a ng-repeat="article in articleList" class="item" 
+             href="#" ui-sref="blog.article({article: simpleId(article.uid)})">
 				<!--<img ng-src="./img/ionic.png" />-->
-				<h2>{{title}}</h2>
-				<h4>{{summary}</h4>
+				<h2>{{article.title}}</h2>
+				<h3>{{article.summary}}</h3>
+                <h4>Date de parution : {{article.meta.releaseDate | date:'dd-MM-yyyy HH:mm:ss'}}</h4>
 			</a>
 		</div>
 	</ion-content>

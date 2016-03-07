@@ -522,8 +522,7 @@ Nous avons pu aborder dans ce chapitre tous les éléments structurels nous perm
 
 
 Note : use service & factory
-Note : Markdown ? vérifier les services
 
 ### VI. Aller plus loin
 
-Note : test de connexion, stockage local ect....
+Note : pull to refresh, test de connexion, stockage local ect....

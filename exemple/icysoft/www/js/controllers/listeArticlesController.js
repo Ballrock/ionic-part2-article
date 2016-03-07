@@ -1,10 +1,18 @@
 'use strict';
 
 angular.module('listeArticlesController', ['article-service'])
-.controller('ListeArtCtrl', function($scope,$state,Articles){
-  	$scope.article = function(id) {
-  		$state.go('blog.article');
-  	}
-    $scope.articleList = Articles.getList();
-    console.log($scope.articleList);
+.controller('ListeArtCtrl', function($scope,Articles){
+    $scope.requestArticleList = function() {
+        Articles.getList().then(function(data) {
+            $scope.articleList = data;
+            $scope.requested = true;
+            console.log($scope.articleList);
+        }); 
+    }
+    $scope.simpleId = function(uid) {
+        return Articles.simpleId(uid);
+    }
+    if ($scope.requested != true) {
+        $scope.requestArticleList();
+    }   
 });
