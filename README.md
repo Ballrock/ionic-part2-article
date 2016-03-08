@@ -484,7 +484,7 @@ angular.module('listeArticlesController', [])
 
 ##### a. [`detailArticle.html`]
 
-J'ai utilisé ici, pour changer, le system de Flexbox integré directement dans Ionic via les classes CSS `row` et `col`, je vous invite à aller voir la description du système de grille [TODO].
+J'ai utilisé ici, pour changer, le system de Flexbox integré directement dans Ionic via les classes CSS `row` et `col`, je vous invite à aller voir la description du [système de grille](http://learn.ionicframework.com/formulas/using-the-grid/).
 
 On obtient quelque chose resemblant à cela :
 
@@ -520,8 +520,118 @@ Nous avons pu aborder dans ce chapitre tous les éléments structurels nous perm
 
 ### V. L'interactivité
 
+##### 1. [`articleService.js`] À votre service ! (Création du service de requetage d'API)
 
-Note : use service & factory
+Vous l'avez compris, j'aime bien structurer (à outrance ?) mes projets Ionic pour faciliter leurs maintenabilités. Pour débuter cette partie sur l'interactivité nous allons demarrer par l'initialisation du module et du service qui nous servira à requéter notre très chère API d'articles. Pour cela nous allons creer une factory angular qui sera appelée dans nos différents controllers.
+
+On placer ce fichier dans un dossier service :
+```bash
+www
+  ├───...
+  └───js
+      ├───controllers
+      └───service
+          └───articleService.js
+```
+
+Il faudra bien sur inclure celui-ci dans le fichier `index.html`.
+
+```js
+'use strict';
+angular.module('article-service', [])
+.factory('Articles', function($http) {
+
+  var urls = {
+    list: 'http://www.icysoft.fr/api/articles',
+    article: 'http://www.icysoft.fr/api/articles/%s'
+  };
+  
+  var replaceUrl = function(url, string){
+    return url.replace("%s", string);  
+  };
+
+  return {
+    getList: function() {
+        return $http.get(urls.list).then(
+            function (response) {
+                return response.data.articles;
+            },
+            function (httpError) {
+                throw httpError.status + " : " +
+                    httpError.data;
+            });
+    },
+    getArticle: function(id) {
+        return $http.get(replaceUrl(urls.article, id)).then(
+            function (response) {
+                return response.data;
+            },
+            function (httpError) {
+                throw httpError.status + " : " +
+                    httpError.data;
+            });
+    },
+    simpleId:  function(uid) {
+        return uid.split(":")[1];
+    }
+  };
+})
+```
+
+Mais voyons plutot ça point par point.
+
+```js
+angular.module('article-service', [])
+.factory('Articles', function($http)
+```
+Ici on initialise le module (ma manie de toujours tout diviser ^^) auquel on associe une [factory](https://docs.angularjs.org/guide/services). `$http` correspond au service HTTP d'angular, il nous permettra de réaliser les appels à l'API via la méthode `get`.
+
+```js
+var urls = {
+    list: 'http://www.icysoft.fr/api/articles',
+    article: 'http://www.icysoft.fr/api/articles/%s'
+};
+
+var replaceUrl = function(url, string){
+    return url.replace("%s", string);  
+};
+```
+Définition des deux url l'un point vers l'API permettant de récupérer tous les articles, l'autre vers l'API permettant de récuperer un article en particulier. Le ``%s` sera remplacé dans la methode `replaceUrl` par le numéro de l'article à consulter.
+
+```js
+return {
+    getList: function() {
+        return $http.get(urls.list).then(
+            function (response) {
+                return response.data.articles;
+            },
+            function (httpError) {
+                throw httpError.status + " : " +
+                    httpError.data;
+            });
+    },
+    getArticle: function(id) {
+        return $http.get(replaceUrl(urls.article, id)).then(
+            function (response) {
+                return response.data;
+            },
+            function (httpError) {
+                throw httpError.status + " : " +
+                    httpError.data;
+            });
+    },
+    simpleId:  function(uid) {
+        return uid.split(":")[1];
+    }
+};
+```
+Le service `$http` utilisant des [promesses](https://docs.angularjs.org/api/ng/service/$q) cela peut être un peu perturbant au premier abord, mais ne vous inquietez pas. Le principe repose sur la manipulation d'un objet qui est la promesse d'une valeur futur (très pratique dans le cas d'un appel asynchrone vous ne trouvez pas ?) Cela nous permet de directement travailler avec cette promesse avant que l'appel soit terminé. Et la plupart du temps, ce n'est pas beaucoup plus compliqué que ça en fait :). On se contente d'appeler la methode `then(success,fail)` pour definir le comportement lorsque la promesse sera réalisée.
+Ainsi, ici, lorsque l'appel est correctement réalisé pour `getArticle` et `getList` on retourne la reponse HTTP (dans notre cas un object JSON). Le seul traitement réalisé ici est pour simplifier le traitement de la données hors du service par la suite.
+La methode `simpleId` est une petite méthode utilitaire que nous utiliserons da
+
+Pour finir vous avez surement remarqué que les methodes `getArticle`, `getList`, `simpleId` et `replaceUrl` ne sont pas définit avec de la même façon. Dans le cas de `replaceUrl` il s'agit d'une methode interne qui ne pourra pas être appeler via `Articles.X()` dans le controller, contrairement aux autres.
+
+##### 2. [`detailArticleControllers.js` && `listeArticlesController.js`] Vous avez le controle (Modification des controllers pour l'interactivité)
 
 ### VI. Aller plus loin
 

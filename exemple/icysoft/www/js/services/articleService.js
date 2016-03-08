@@ -1,6 +1,5 @@
 'use strict';
 angular.module('article-service', [])
-
 .factory('Articles', function($http) {
 
   var urls = {
@@ -16,7 +15,7 @@ angular.module('article-service', [])
     getList: function() {
         return $http.get(urls.list).then(
             function (response) {
-            return response.data.articles;
+                return response.data.articles;
             },
             function (httpError) {
                 throw httpError.status + " : " +
@@ -26,7 +25,7 @@ angular.module('article-service', [])
     getArticle: function(id) {
         return $http.get(replaceUrl(urls.article, id)).then(
             function (response) {
-            return response.data;
+                return response.data;
             },
             function (httpError) {
                 throw httpError.status + " : " +
