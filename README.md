@@ -633,6 +633,147 @@ Pour finir vous avez surement remarqué que les methodes `getArticle`, `getList`
 
 ##### 2. [`detailArticleControllers.js` && `listeArticlesController.js`] Vous avez le controle (Modification des controllers pour l'interactivité)
 
+Coté controller le but va être de récupérer les informations du service pour pouvoir les traiter dans le modele. On n'oubliera pas d'ajouter un petit filtre pour eviter les appels multiples inutiles à l'API.
+
+###### a. [`listeArticlesController.js`]
+
+Dans ce controller, nous allons recuperer et attribuer les données de l'API qui liste les articles disponibles.
+```js
+'use strict';
+angular.module('listeArticlesController', ['article-service'])
+.controller('ListeArtCtrl', function($scope,Articles){
+    $scope.requestArticleList = function() {
+        Articles.getList().then(function(data) {
+            $scope.articleList = data;
+            $scope.requested = true;
+        }); 
+    }
+    $scope.simpleId = function(uid) {
+        return Articles.simpleId(uid);
+    }
+    
+    if ($scope.requested != true) {
+        $scope.requestArticleList();
+    }   
+});
+```
+On voit que le controller reste très petit.
+
+```js
+$scope.requestArticleList = function() {
+    Articles.getList().then(function(data) {
+        $scope.articleList = data;
+        $scope.requested = true;
+    }); 
+}
+$scope.simpleId = function(uid) {
+    return Articles.simpleId(uid);
+}
+```
+Deux fonctions sont définit dans le scope ici `requestArticleList` et `simpleId`, nous allons nous interresser à la première sachant que la seconde est uniquement un appel à la méthode identique du service. 
+`requestArticleList` appelle la promesse via la methode `getList` du service Articles. On appele ensuite la methode `then` pour résoudre la promesse. Dans cette méthode j'ai choisi de définir un attribut du scope pour les données recupérées et un booléen pour éviter les appels multiples à l'API.
+`articleList` sera appelé dans notre template via des directives AngularJS.
+
+###### b. [`detailArticleControllers.js`]
+On suit le même principe que précedemment ici, la principale différence se situe uniquement dans la méthode appelée par le service.
+
+```js
+angular.module('detailArticleController', [])
+.controller('DetailArtCtrl', function($scope, $stateParams, Articles){
+    console.log($stateParams);
+    $scope.requestArticle = function() {
+        Articles.getArticle($stateParams.article).then(function(data) {
+            $scope.article = data;
+            $scope.requested = true;
+            console.log($scope.article);
+        }); 
+    }
+    if ($scope.requested != true) {
+        $scope.requestArticle();
+    }   
+});
+```
+
+Les plus attentifs remarqueront l'absences des méthode de changement en effet, celles-ci ont été supprimé au profit de directive directement définit dans les templates. Nous verrons ce point dans la prochaine partie.
+
+##### 3. [`detailArticle.html` && `listeArticles.html`] Il est vivant ! (Modification des templates pour l'interactivité)
+
+Vous allez voir que beaucoup de choses ont été simplifiés dans cette partie, la structure des pages (sur les images) ont été revues pour coller aux informations disponibles dans l'API.
+
+###### a. [`listeArticles.html`]
+
+```html
+<ion-view view-title="Blog">
+	<ion-content class="padding">
+		<div class="list">
+			<a ng-repeat="article in articleList" class="item" 
+             href="#" ui-sref="blog.article({article: simpleId(article.uid)})">
+				<!--<img ng-src="./img/ionic.png" />-->
+				<h2>{{article.title}}</h2>
+				<h3>{{article.summary}}</h3>
+                <h4>Date de parution : {{article.meta.releaseDate | date:'dd-MM-yyyy HH:mm:ss'}}</h4>
+			</a>
+		</div>
+	</ion-content>
+</ion-view>
+```
+
+C'est vachement plus joli non ? Voyons quelques point :
+
+```html
+<a ng-repeat="article in articleList" [...]
+```
+Il s'agit ici de la directive `repeat` de angular qui permet de parcourir un tableau d'informations et de repeter le code HTML fils autant de fois que de valeur présente dans ce tableau. On définit la variable `article` qui correspondra à un élément de notre tableau.
+
+```html
+ ui-sref="blog.article({article: simpleId(article.uid)})">
+```
+C'est ce dont je vous parlais à l'instant, c'est ce qui remplace notre méthode de changement d'emplacement précédent (`ng-click`). On definit donc ici ce qui sera passé en valeur pour article dans la route de détail d'article. On appel `simpleId` pour transformer l'uid au format article:X en X.
+
+```html
+<h2>{{article.title}}</h2>
+<h3>{{article.summary}}</h3>
+<h4>Date de parution : {{article.meta.releaseDate | date:'dd-MM-yyyy HH:mm:ss'}}</h4>
+```
+C'est de cette facon que l'on appel les valeurs des données contenu dans chaque `article` de `articleList`. Une petite spécificité pour la date de parution de l'article qui utilise un filtre standard AngularJS pour représenter la Date (initialement TimeStamp dans les données) dans le format voulu.
+
+Et c'est tout !
+
+###### b. [`detailArticle.html`]
+```html
+<ion-view view-title="{{article.title}}">
+  <ion-content class="padding">
+    <div>
+        <h2>{{article.title}}</h2>
+        <h5>{{article.meta.releaseDate | date:'dd-MM-yyyy HH:mm:ss'}}</h5>
+    </div>
+    <div ng-bind-html="article.bodyHTML">
+    </div>
+  </ion-content>
+</ion-view>
+```
+
+On reprend exactement le meme principe que pour la liste d'article sauf que cette fois, nul besoin de ng-repeat, la donnée étant unique. la petite spécifité est sur l'utilisation de la directive `ng-bind-html`. Cette dernière nous permet ici d'interpreter le HTML qui nous est renvoyé par l'API directement à l'interieur de cette DIV
+
+###### c. CORS de guerre
+
+Et la viens le moment fatidique ou vous testez sur votre envirronement local via un `ionic serve` et que ca ne marche PAS !
+
+Dans le cas ou vous obtenez une erreur du style :
+```bash
+XMLHttpRequest cannot load http://www.icysoft.fr/api/articles. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:8100' is therefore not allowed access.
+```
+
+Il s'agit d'un problème typique de CORS, le serveur distant et votre navigateur n'autorise pas l'appel à une ressource sur un autre nom de domaine que celui d'ou l'appel emane. Je vous conseil de lire [ce très bon article]() de Ionic sur le sujet qui vous propose également des solutions pour palier à cela. À savoir que ce problème ne se produira que sur votre navigateur en test, l'application déployée sur un téléphone fonctionnera car non sujette aux regles CORS.
+ 
 ### VI. Aller plus loin
 
-Note : pull to refresh, test de connexion, stockage local ect....
+Et voila, après un peu d'effort nous avons une application interactive :
+
+<img src="./img/final.gif" />
+
+Vous remarquerais que je n'ai pas fait trop d'effort sur le formatage du HTML des articles, ce point n'etant pas vraiement le but de ce tuto :p Les sources de l'application ainsi que le MarkDown de l'articles sont disponible sur mon [GitHub](https://github.com/Ballrock/ionic-presentation-part2). N'hésitez pas à faire des PR si le coeur vous en dit :)
+
+Pour finir, il est bien sur possible d'aller beaucoup plus loin en intégrant par exemple un systeme de "pull to refresh" pour mettre à jour la liste, un test de connexion ou même une interactivuté avec des likes ou des commentaires. Cela peut aller aussi loin que votre imagination.
+
+J'espère que cet article aura su vous aider dans votre approche de Ionic, je vous souhaite un bon developpement et vous dit une prochaine pour d'autre articles :)

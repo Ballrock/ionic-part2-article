@@ -6,12 +6,12 @@ angular.module('listeArticlesController', ['article-service'])
         Articles.getList().then(function(data) {
             $scope.articleList = data;
             $scope.requested = true;
-            console.log($scope.articleList);
         }); 
     }
     $scope.simpleId = function(uid) {
         return Articles.simpleId(uid);
     }
+    
     if ($scope.requested != true) {
         $scope.requestArticleList();
     }   
