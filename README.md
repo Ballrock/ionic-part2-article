@@ -106,7 +106,7 @@ J'ai abordé très vite cette partie dans l'article 1 qui n'avait pour but que d
 Pour naviguer dans un site internet ou meme dans la vie de tout les jours il est important de savoir ou est-ce que l'on va, que ce soit en cliquant sur un lien ou à un embranchement de route. Dans une application ionic c'est un peu pareil sauf que pour concerver l'état de l'application d'une page à l'autre on utilise un router et, plus precisement `angular-ui-router`. Ce router va définir pour chaque embranchement ou url dans notre cas, le template et/ou le controller à utiliser. Ce qui vous me l'accorderez corresponds pas mal à ce que nous avons initialisé juste au-dessus... De la à dire que je l'ai fait exprès :p
 
 ##### a. [`index.html`]
-Occupons nous tout d'abord du fichier index.html. Ce dernier apportera le support à tous les templates. C'est le layout de base dans lequel sera inclus nos templates. Nous allons déjà voir ce que celui-ci contient`suite à l'init de projet avec le starter blank.
+Occupons nous tout d'abord du fichier index.html. Ce dernier apportera le support à tous les templates. C'est le layout de base dans lequel sera inclus nos templates. Nous allons déjà voir ce que celui-ci contient suite à l'init de projet avec le starter blank.
 ```html
 <!DOCTYPE html>
 <html>
